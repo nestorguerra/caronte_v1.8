@@ -456,4 +456,29 @@ document.addEventListener('DOMContentLoaded', () => {
     } catch (e) {
         console.error('Error constructing Dashboard:', e);
     }
+
+    // FALLBACK: If questions container is empty, render questions directly
+    const container = document.getElementById('questions-container');
+    if (container && container.innerHTML.trim() === '') {
+        console.log('Fallback: Rendering questions directly');
+        QUESTIONS.forEach((q, index) => {
+            const html = `
+                <div class="question-card">
+                    <div class="question-title">Pregunta ${index + 1} / ${QUESTIONS.length}</div>
+                    <div class="question-text">${q}</div>
+                    <textarea class="answer-area" id="q-${index}" 
+                        oninput="autoSaveAnswer(${index})" 
+                        placeholder="Escribe tu respuesta aquí..."></textarea>
+                </div>
+            `;
+            container.innerHTML += html;
+        });
+
+        // Load any saved answers
+        const savedAnswers = JSON.parse(localStorage.getItem('caronte_answers_demo@caronte.com') || '{}');
+        Object.keys(savedAnswers).forEach(key => {
+            const el = document.getElementById(`q-${key}`);
+            if (el) el.value = savedAnswers[key];
+        });
+    }
 });
